@@ -1,0 +1,26 @@
+alias CID : string
+alias Path : string
+alias Multiaddr : string
+
+service IpfsClient("ipfs client"):
+    id(multiaddr: string) -> string
+    exists(multiaddr: string, cid: CID) -> bool
+    upload(multiaddr: string, path: string) -> CID
+    upload_string(multiaddr: string, contents: string) -> CID
+    dag_upload(multiaddr: string, path: string) -> CID
+    dag_upload_string(multiaddr: string, contents: string) -> CID
+    remove(multiaddr: string, cid: CID)-> string
+
+service FileSystem("file system"):
+    list(directory: string) -> []Path
+    list_ext(directory: string, ext: string) -> []Path
+
+func upload_script(ipfs: Multiaddr, path: string) -> CID:
+    <- IpfsClient.upload_string(ipfs, path)
+
+func exists(multiaddr: string, cid: CID) -> bool:
+    <- IpfsClient.exists(multiaddr, cid)
+
+func list(dir: string) -> []Path:
+    <- FileSystem.list(dir)
+
