@@ -297,6 +297,161 @@ export function registerFileSystem(...args: any) {
 }
       
 // Functions
+export const id_script = `
+                    (xor
+                     (seq
+                      (seq
+                       (seq
+                        (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
+                        (call %init_peer_id% ("getDataSrv" "multiaddr") [] multiaddr)
+                       )
+                       (call %init_peer_id% ("ipfs client" "id") [multiaddr] id)
+                      )
+                      (xor
+                       (call %init_peer_id% ("callbackSrv" "response") [id])
+                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
+                      )
+                     )
+                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
+                    )
+    `
+ 
+
+export function id(
+    multiaddr: string,
+    config?: {ttl?: number}
+): Promise<string>;
+
+export function id(
+    peer: IFluenceClient$$,
+    multiaddr: string,
+    config?: {ttl?: number}
+): Promise<string>;
+
+export function id(...args: any) {
+
+
+    return callFunction$$(
+        args,
+        {
+    "functionName" : "id",
+    "arrow" : {
+        "tag" : "arrow",
+        "domain" : {
+            "tag" : "labeledProduct",
+            "fields" : {
+                "multiaddr" : {
+                    "tag" : "scalar",
+                    "name" : "string"
+                }
+            }
+        },
+        "codomain" : {
+            "tag" : "unlabeledProduct",
+            "items" : [
+                {
+                    "tag" : "scalar",
+                    "name" : "string"
+                }
+            ]
+        }
+    },
+    "names" : {
+        "relay" : "-relay-",
+        "getDataSrv" : "getDataSrv",
+        "callbackSrv" : "callbackSrv",
+        "responseSrv" : "callbackSrv",
+        "responseFnName" : "response",
+        "errorHandlingSrv" : "errorHandlingSrv",
+        "errorFnName" : "error"
+    }
+},
+        id_script
+    )
+}
+
+export const remove_script = `
+                    (xor
+                     (seq
+                      (seq
+                       (seq
+                        (seq
+                         (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
+                         (call %init_peer_id% ("getDataSrv" "multiaddr") [] multiaddr)
+                        )
+                        (call %init_peer_id% ("getDataSrv" "cid") [] cid)
+                       )
+                       (call %init_peer_id% ("ipfs client" "remove") [multiaddr cid] remove)
+                      )
+                      (xor
+                       (call %init_peer_id% ("callbackSrv" "response") [remove])
+                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
+                      )
+                     )
+                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
+                    )
+    `
+ 
+
+export function remove(
+    multiaddr: string,
+    cid: string,
+    config?: {ttl?: number}
+): Promise<string>;
+
+export function remove(
+    peer: IFluenceClient$$,
+    multiaddr: string,
+    cid: string,
+    config?: {ttl?: number}
+): Promise<string>;
+
+export function remove(...args: any) {
+
+
+    return callFunction$$(
+        args,
+        {
+    "functionName" : "remove",
+    "arrow" : {
+        "tag" : "arrow",
+        "domain" : {
+            "tag" : "labeledProduct",
+            "fields" : {
+                "multiaddr" : {
+                    "tag" : "scalar",
+                    "name" : "string"
+                },
+                "cid" : {
+                    "tag" : "scalar",
+                    "name" : "string"
+                }
+            }
+        },
+        "codomain" : {
+            "tag" : "unlabeledProduct",
+            "items" : [
+                {
+                    "tag" : "scalar",
+                    "name" : "string"
+                }
+            ]
+        }
+    },
+    "names" : {
+        "relay" : "-relay-",
+        "getDataSrv" : "getDataSrv",
+        "callbackSrv" : "callbackSrv",
+        "responseSrv" : "callbackSrv",
+        "responseFnName" : "response",
+        "errorHandlingSrv" : "errorHandlingSrv",
+        "errorFnName" : "error"
+    }
+},
+        remove_script
+    )
+}
+
 export const exists_script = `
                     (xor
                      (seq
@@ -379,18 +534,21 @@ export function exists(...args: any) {
     )
 }
 
-export const list_script = `
+export const upload_string_script = `
                     (xor
                      (seq
                       (seq
                        (seq
-                        (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
-                        (call %init_peer_id% ("getDataSrv" "dir") [] dir)
+                        (seq
+                         (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
+                         (call %init_peer_id% ("getDataSrv" "multiaddr") [] multiaddr)
+                        )
+                        (call %init_peer_id% ("getDataSrv" "contents") [] contents)
                        )
-                       (call %init_peer_id% ("file system" "list") [dir] list)
+                       (call %init_peer_id% ("ipfs client" "upload_string") [multiaddr contents] upload_string)
                       )
                       (xor
-                       (call %init_peer_id% ("callbackSrv" "response") [list])
+                       (call %init_peer_id% ("callbackSrv" "response") [upload_string])
                        (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
                       )
                      )
@@ -399,30 +557,36 @@ export const list_script = `
     `
  
 
-export function list(
-    dir: string,
+export function upload_string(
+    multiaddr: string,
+    contents: string,
     config?: {ttl?: number}
-): Promise<string[]>;
+): Promise<string>;
 
-export function list(
+export function upload_string(
     peer: IFluenceClient$$,
-    dir: string,
+    multiaddr: string,
+    contents: string,
     config?: {ttl?: number}
-): Promise<string[]>;
+): Promise<string>;
 
-export function list(...args: any) {
+export function upload_string(...args: any) {
 
 
     return callFunction$$(
         args,
         {
-    "functionName" : "list",
+    "functionName" : "upload_string",
     "arrow" : {
         "tag" : "arrow",
         "domain" : {
             "tag" : "labeledProduct",
             "fields" : {
-                "dir" : {
+                "multiaddr" : {
+                    "tag" : "scalar",
+                    "name" : "string"
+                },
+                "contents" : {
                     "tag" : "scalar",
                     "name" : "string"
                 }
@@ -432,11 +596,8 @@ export function list(...args: any) {
             "tag" : "unlabeledProduct",
             "items" : [
                 {
-                    "tag" : "array",
-                    "type" : {
-                        "tag" : "scalar",
-                        "name" : "string"
-                    }
+                    "tag" : "scalar",
+                    "name" : "string"
                 }
             ]
         }
@@ -451,7 +612,7 @@ export function list(...args: any) {
         "errorFnName" : "error"
     }
 },
-        list_script
+        upload_string_script
     )
 }
 
@@ -534,6 +695,82 @@ export function upload_script(...args: any) {
     }
 },
         upload_script_script
+    )
+}
+
+export const list_script = `
+                    (xor
+                     (seq
+                      (seq
+                       (seq
+                        (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
+                        (call %init_peer_id% ("getDataSrv" "dir") [] dir)
+                       )
+                       (call %init_peer_id% ("file system" "list") [dir] list)
+                      )
+                      (xor
+                       (call %init_peer_id% ("callbackSrv" "response") [list])
+                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
+                      )
+                     )
+                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
+                    )
+    `
+ 
+
+export function list(
+    dir: string,
+    config?: {ttl?: number}
+): Promise<string[]>;
+
+export function list(
+    peer: IFluenceClient$$,
+    dir: string,
+    config?: {ttl?: number}
+): Promise<string[]>;
+
+export function list(...args: any) {
+
+
+    return callFunction$$(
+        args,
+        {
+    "functionName" : "list",
+    "arrow" : {
+        "tag" : "arrow",
+        "domain" : {
+            "tag" : "labeledProduct",
+            "fields" : {
+                "dir" : {
+                    "tag" : "scalar",
+                    "name" : "string"
+                }
+            }
+        },
+        "codomain" : {
+            "tag" : "unlabeledProduct",
+            "items" : [
+                {
+                    "tag" : "array",
+                    "type" : {
+                        "tag" : "scalar",
+                        "name" : "string"
+                    }
+                }
+            ]
+        }
+    },
+    "names" : {
+        "relay" : "-relay-",
+        "getDataSrv" : "getDataSrv",
+        "callbackSrv" : "callbackSrv",
+        "responseSrv" : "callbackSrv",
+        "responseFnName" : "response",
+        "errorHandlingSrv" : "errorHandlingSrv",
+        "errorFnName" : "error"
+    }
+},
+        list_script
     )
 }
 

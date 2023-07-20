@@ -9,7 +9,7 @@ service IpfsClient("ipfs client"):
     upload_string(multiaddr: string, contents: string) -> CID
     dag_upload(multiaddr: string, path: string) -> CID
     dag_upload_string(multiaddr: string, contents: string) -> CID
-    remove(multiaddr: string, cid: CID)-> string
+    remove(multiaddr: string, cid: CID) -> string
 
 service FileSystem("file system"):
     list(directory: string) -> []Path
@@ -20,6 +20,15 @@ func upload_script(ipfs: Multiaddr, path: string) -> CID:
 
 func exists(multiaddr: string, cid: CID) -> bool:
     <- IpfsClient.exists(multiaddr, cid)
+
+func id(multiaddr: string) -> string:
+    <- IpfsClient.id(multiaddr)
+
+func upload_string(multiaddr: string, contents: string) -> CID:
+    <- IpfsClient.upload_string(multiaddr, contents)
+
+func remove(multiaddr: string, cid: CID) -> string:
+    <- IpfsClient.remove(multiaddr, cid)
 
 func list(dir: string) -> []Path:
     <- FileSystem.list(dir)
